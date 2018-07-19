@@ -1585,8 +1585,7 @@ MainLoop:
 			return true;
 		}
 
-		var i, tick, stash,
-			telekinesis = me.classid === 1 && me.getSkill(43, 1);
+		var i, tick, stash;
 
 		for (i = 0; i < 5; i += 1) {
 			this.move("stash");
@@ -1594,12 +1593,8 @@ MainLoop:
 			stash = getUnit(2, 267);
 
 			if (stash) {
-				if (telekinesis) {
-					Skill.cast(43, 0, stash);
-				} else {
-					Misc.click(0, 0, stash);
-					//stash.interact();
-				}
+				Misc.click(0, 0, stash);
+				//stash.interact();
 
 				tick = getTickCount();
 
@@ -1622,8 +1617,6 @@ MainLoop:
 				} else {
 					this.move("stash");
 				}
-
-				telekinesis = false;
 			}
 		}
 
@@ -1900,7 +1893,7 @@ MainLoop:
 					items[i].classid !== 547 && // The Golden Bird
 					items[i].classid !== 548 && // Lam Esen's Tome
 					items[i].classid !== 553 && // Khalim's Eye
-					items[i].classid !== 554 && // Khalim's Heart 
+					items[i].classid !== 554 && // Khalim's Heart
 					items[i].classid !== 555 && // Khalim's Brain
 					items[i].classid !== 173 && // Khalim's Flail
 					items[i].classid !== 174 && // Khalim's Will
@@ -2084,7 +2077,7 @@ MainLoop:
 
 	moveToSpot: function (spot) {
 		var i, path, townSpot,
-			longRange = (me.classid === 1 && this.telekinesis && me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint";
+			longRange = (spot === "waypoint");
 
 		if (!this.act[me.act - 1].hasOwnProperty("spot") || !this.act[me.act - 1].spot.hasOwnProperty(spot)) {
 			return false;

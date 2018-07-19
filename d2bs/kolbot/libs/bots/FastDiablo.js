@@ -186,8 +186,13 @@ function FastDiablo() {
 			if (seal.mode) {
 				return true;
 			}
-
-			sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
+			
+			if (classid === 394) {
+				Misc.click(0, 0, seal);
+			} else {
+				seal.interact();	
+			}
+			
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {

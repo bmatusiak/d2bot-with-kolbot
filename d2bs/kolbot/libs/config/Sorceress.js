@@ -186,7 +186,7 @@ function LoadConfig() {
 		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
 	Scripts.KillDclone = false; // Kill Diablo Clone by using Arcane Sanctuary waypoint. Diablo needs to walk the Earth in the game.
 	Scripts.ShopBot = false; // Shopbot script. Automatically uses shopbot.nip and ignores other pickits.
-		// Supported NPCs: Akara, Elzix, Fara, Drognan, Ormus, Asheara, Anya. Multiple NPCs are also supported, example: ["Elzix", "Fara"]
+		// Supported NPCs: Akara, Charsi, Gheed, Elzix, Fara, Drognan, Ormus, Asheara, Hratli, Jamella, Halbu, Anya. Multiple NPCs are also supported, example: ["Elzix", "Fara"]
 		// Use common sense when combining NPCs. Shopping in different acts will probably lead to bugs.
 		Config.ShopBot.ShopNPC = "Anya";
 		// Put item classid numbers or names to scan (remember to put quotes around names). Leave blank to scan ALL items. See libs/config/templates/ShopBot.txt
@@ -413,7 +413,7 @@ function LoadConfig() {
 	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of Faster Block Recovery.
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of Increased Attack Speed.
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
-	Config.WaypointMenu = false; // Set to true for Single and private realms
+	Config.WaypointMenu = true;
 
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile.
