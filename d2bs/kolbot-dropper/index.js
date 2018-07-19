@@ -294,7 +294,7 @@ $(function() {
             })
             
         }
-        Api.prototype.get = function(key, val, done) {
+        Api.prototype.get = function(key, done) {
             var self = this;
 
             self.$get("/get?key=" + key, false, function(msg, request) {
