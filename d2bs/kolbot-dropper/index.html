@@ -27,12 +27,45 @@
 	<!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
+	<style>
+		
+		@media (min-width: 1200px){
+			
+			.row-fluid {
+				margin:0;
+				padding:0;
+			}
+			.container-fluid {
+				margin:0;
+				padding:0;
+			}
+			.row-fluid > .span2 {
+				margin:0;
+				padding:0;
+				width:16%;
+			}
+			.row-fluid > .span7 {
+				margin:0;
+				padding:0;
+				width:64%;
+			}
+			.row-fluid > .span3 {
+				margin:0;
+				padding:0;
+				width:20%;
+			}
+			
+			.widget.stacked{
+				margin:0;
+				padding:0;
+			}
+		}
+	</style>
 </head>
 
 <body>
 
-	<div class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom:25px;">
+	<div class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom:0px;">
 
 		<div class="navbar-inner">
 
@@ -165,7 +198,6 @@
 
 						<div class="widget-content">
 							
-							<div class="row-fluid">
 								<div class="span2" style="background-color:red">
 									Item Picture
 								</div>
@@ -175,7 +207,6 @@
 								<div class="span2" style="background-color:red">
 									Account Info
 								</div>
-							</div>
 
 						</div>
 						<!-- /widget-content -->
