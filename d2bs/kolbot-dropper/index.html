@@ -28,6 +28,9 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 	<style>
+		.widget-content.itemsList  > div {
+			margin:0;
+		}
 		
 		@media (min-width: 768px){
 			
@@ -59,13 +62,25 @@
 				margin:0;
 				padding:0;
 			}
+			
+			.left-static-col{
+				position: fixed;
+			    top: 57px;
+			    left: 0;
+			}
+			
+			.right-static-col{
+				position: fixed;
+			    top: 57px;
+			    right: 0;
+			}
 		}
 	</style>
 </head>
 
 <body>
-
-	<div class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom:0px;">
+	<div style="width:100%;height:57px"></div>
+	<div class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom:0px;position:fixed;top:0;">
 
 		<div class="navbar-inner">
 
@@ -120,7 +135,10 @@
 
 			<div class="row-fluid">
 
-				<div class="span2">
+				<div class="span2"></div>
+				
+				<div class="span2 left-static-col">
+					
 
 					<div class="widget stacked">
 
@@ -196,18 +214,41 @@
 						</div>
 						<!-- /widget-header -->
 
-						<div class="widget-content">
+						<div class="widget-content itemsList">
 							
-								<div class="span2">
-									Item Picture
-								</div>
-								<div class="span6">
-									Item Info
-								</div>
-								<div class="span4">
-									Account Info
-								</div>
-
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								<div class="span2">Item Picture</div><div class="span6">Item Info</div><div class="span4">Account Info</div><br/><hr>
+								
+								
 						</div>
 						<!-- /widget-content -->
 
@@ -217,7 +258,9 @@
 				</div>
 				<!-- /span6 -->
 
-				<div class="span3">
+				<div class="span3"></div>
+				
+				<div class="span3 right-static-col">
 
 					<div class="widget stacked">
 
