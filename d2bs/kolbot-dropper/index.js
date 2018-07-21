@@ -233,36 +233,16 @@ $(function() {
     }));
     
     var API = (function() {
-
+        // store/retreieve/delete for the temp storage, accounts, profiles, query and start
         function Api() {}
 
-        Api.prototype.$post = function(api, data, done, fail) {
+        Api.prototype.$get = function(requestObject, done, fail) {
+            var Base64blob = window.Base64.encode(JSON.stringify(requestObject))
             var $request = {
-                url: api,
-                method: "POST",
-                dataType: "html"
+                url: "/" + Base64blob,
+                method: "GET",
+                dataType: "json"
             }
-            if (data)
-                $request.data = data;
-            var request = $.ajax($request);
-            request.done(function(msg) {
-                if (done)
-                    done(msg, request);
-            });
-            request.fail(function(jqXHR, textStatus) {
-                if (fail)
-                    fail(jqXHR, textStatus, request);
-            });
-        }
-
-        Api.prototype.$get = function(api, data, done, fail) {
-            var $request = {
-                url: "/" + api,
-                method: "POST",
-                dataType: "html"
-            }
-            if (data)
-                $request.data = data;
             var request = $.ajax($request);
             request.done(function(msg) {
                 if (done)
@@ -275,19 +255,10 @@ $(function() {
         }
 
         //theClientApi
-        Api.prototype.login = function(hash, done) {
-            var self = this;
-
-            self.$get("/login?hash="+hash, false, function(msg, request) {
-                done(null, msg)
-            }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
         Api.prototype.set = function(key, val, done) {
             var self = this;
 
-            self.$get("/set?key=" + key + "&value=" + val, false, function(msg, request) {
+            self.$get({profile:"web",func:"set",key:key,value:val}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
@@ -297,7 +268,7 @@ $(function() {
         Api.prototype.get = function(key, done) {
             var self = this;
 
-            self.$get("/get?key=" + key, false, function(msg, request) {
+            self.$get({func:"get",key:key}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
@@ -305,7 +276,7 @@ $(function() {
         }
         Api.prototype.accounts = function(done) {
             var self = this;
-            self.$get("/accounts", false, function(msg, request) {
+            self.$get({profile:"web",func:"accounts",args:[]}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
@@ -313,54 +284,71 @@ $(function() {
         }
         Api.prototype.profiles = function(done) {
             var self = this;
-            self.$get("/profiles", false, function(msg, request) {
+            self.$get({profile:"web",func:"profiles",args:[""]}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
             })
         }
-        Api.prototype.query = function(queryObject, done) {
+        Api.prototype.query = function(item,realm,account,charname, done) {
             var self = this;
-
-            var query = "?realm=" + queryObject.realm +
-                (queryObject.acc ? "&acc=" + queryObject.acc : "") +
-                (queryObject.char ? "&char=" + queryObject.char : "");
-
-            self.$get("/query" + query, false, function(msg, request) {
+            var args = [];
+            if(item) args.push(item); else args.push("");
+            if(realm) args.push(realm); else args.push("");
+            if(account) args.push(account); else args.push("");
+            if(charname) args.push(charname); else args.push("");
+            
+            self.$get({profile:"web",func:"query",args:args}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
             })
         }
 
-        Api.prototype.find = function(queryObject, done) {
-            var self = this;
-            var query = "?realm=" + queryObject.realm +
-                (queryObject.type ? "&type=" + queryObject.type : "") +
-                (queryObject.data ? "&data=" + window.Base64.encode(queryObject.data) : "");
-
-            self.$get("/find" + query, false, function(msg, request) {
-                done(null, msg)
-            }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
-        
         Api.prototype.start = function(queryObject, done) {
             var self = this;
             var query = "?profile=" + queryObject.profile +
                 (queryObject.data ? "&data=" + window.Base64.encode(queryObject.data) : "");
 
-            self.$get("/start"+query, false, function(msg, request) {
+            self.$get("/start"+query, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
             })
         }
 
-
-
         return new Api();
     })()
 
+    
+    API.profiles(function(err,accounts){
+        console.log("API.profiles");
+        console.log(err,accounts);
+    })
+    
+    /*
+    API examples:
+    Query
+    Get all items from account “chaoscreater” in USEast
+    {"profile":"web","func":"query","args":["","USEast",”chaoscreater”]}
+    
+    Get all items from account “chaoscreater”, character “ChaosCaller” in USEast
+    {"profile":"web","func":"query","args":["","USEast",”chaoscreater”,”ChaosCaller”]}
+    
+    Get any item with “cube” from account “chaoscreater”, character “ChaosCaller” in USEast
+    {"profile":"web","func":"query","args":["cube","USEast",”chaoscreater”,”ChaosCaller”]}
+    -- this will basically give you horadric cube for example
+
+    */
+    API.query("","USEast","","",function(err,results){
+        console.log("API.query","(","'',","'USEast',","'',","''",")");
+        console.log(err,results);
+    })
+    
+    API.accounts(function(err,accounts){
+        console.log("API.accounts");
+        console.log(err,accounts);
+    })
+    
+    
 })
