@@ -274,9 +274,13 @@ $(function() {
                 done(textStatus)
             })
         }
-        Api.prototype.accounts = function(done) {
+        Api.prototype.accounts = function(account, done) {
             var self = this;
-            self.$get({profile:"web",func:"accounts",args:[]}, function(msg, request) {
+            var args = [];
+            if(account)
+                args.push(account)
+            
+            self.$get({profile:"web",func:"accounts",args:args}, function(msg, request) {
                 done(null, msg)
             }, function(jqXHR, textStatus) {
                 done(textStatus)
@@ -295,8 +299,8 @@ $(function() {
             var args = [];
             if(item) args.push(item); else args.push("");
             if(realm) args.push(realm); else args.push("");
-            if(account) args.push(account); else args.push("");
-            if(charname) args.push(charname); else args.push("");
+            if(account) args.push(account); //else args.push("");
+            if(charname) args.push(charname); //else args.push("");
             
             self.$get({profile:"web",func:"query",args:args}, function(msg, request) {
                 done(null, msg)
@@ -319,36 +323,335 @@ $(function() {
 
         return new Api();
     })()
+    
+    var CurrentRealm;
+    var CurrentGameType;
+    var CurrentGameMode;
+    var CurrentGameClass;
+    
+    window.API = API;
+    
+    var listOfAccounts = {};
+    
+    $("#accountSelect").change(function(){
+        $("#characterSelect").html("")
+        var $thisAccount = $(this).val();
+        
+        var csoption = $("<option/>");
+        csoption.text("AutoLoad")
+        $("#characterSelect").append(csoption)
+        
+        for (var j in listOfAccounts[$thisAccount]) {
 
-    
-    API.profiles(function(err,accounts){
-        console.log("API.profiles");
-        console.log(err,accounts);
-    })
-    
-    /*
-    API examples:
-    Query
-    Get all items from account “chaoscreater” in USEast
-    {"profile":"web","func":"query","args":["","USEast",”chaoscreater”]}
-    
-    Get all items from account “chaoscreater”, character “ChaosCaller” in USEast
-    {"profile":"web","func":"query","args":["","USEast",”chaoscreater”,”ChaosCaller”]}
-    
-    Get any item with “cube” from account “chaoscreater”, character “ChaosCaller” in USEast
-    {"profile":"web","func":"query","args":["cube","USEast",”chaoscreater”,”ChaosCaller”]}
-    -- this will basically give you horadric cube for example
+            var csoption = $("<option/>");
+            csoption.text(listOfAccounts[$thisAccount][j])
 
-    */
-    API.query("","USEast","","",function(err,results){
-        console.log("API.query","(","'',","'USEast',","'',","''",")");
-        console.log(err,results);
+            $("#characterSelect").append(csoption)
+
+        }
+        
+        refreshList()
+    })
+    $("#searchItem").change(function() {
+       refreshList()
+    })
+    $("#searchItem").keyup(function() {
+       refreshList()
+    })
+    $("#characterSelect").change(function(){
+       refreshList()
     })
     
-    API.accounts(function(err,accounts){
-        console.log("API.accounts");
-        console.log(err,accounts);
-    })
+    function refreshList(){
+        window.loadMoreItem = false;
+        $("#itemsList").html("");
+        addItemstoList()
+    }
+    function cleanDecription(description) {
+        var desc = description.toString()
+        var $desc;
+        
+        $desc = desc.split(/\r\n|\r|\n/g);
+        desc = $desc.join("<br/>")
+        
+        $desc = desc.split("$");
+        desc = $desc[0]
+        
+        desc = encodeURIComponent(desc)
+        $desc = desc.split(/%3Fc0/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc1/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc2/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc3/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc4/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc5/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc6/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc7/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc8/g); 
+        desc = $desc.join("")
+        $desc = desc.split(/%3Fc9/g); 
+        desc = $desc.join("")
+        desc = decodeURIComponent(desc)
+        
+        return desc;
+    }
     
+
+    function $addItem(result){
+        var itemUID = result.description.split("$")[1]
+            var htmlTemplate = '<div class="row itemsListitem">' +
+                '<div class="span2 "><img src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> </div>' +
+                '<div class="span5">' + cleanDecription(result.description) + '</div>' +
+                '<div class="span5">' + 
+                    
+                    CurrentRealm+"/"+ result.account + "/" + result.character +"/{"+itemUID+'}'+ "<br/>" +
+                    
+                    (result.lod ? "Lod" : "Classic")+"/"+(result.sc ? "Softcore" : "Hardcore")+"/"+(result.ladder ? "Ladder" : "NonLadder" )+
+                    
+                    
+                '</div>' +
+                '</div><hr>'
+
+            var $item = $(htmlTemplate);
+            $item.click(function() {
+                $(this).toggleClass("selected")
+            })
+            $("#itemsList").append($item);
+    }
     
+    function addItemstoList() {
+        
+        function doQuery($account, $character,loadMoreItem){
+            window.loadMoreItem = false;
+            
+            API.query($("#searchItem").val(), CurrentRealm, $account, $character, function(err, results) {
+                //console.log(results)
+                var itemsList = $("#itemsList");
+                
+                var y = $(window).scrollTop();  //your current y position on the page
+                
+                for (var i in results) {
+                    var checks = {
+                        ladder: CurrentGameClass == "Ladder" ? true : false,
+                        lod: CurrentGameType == "Lod" ? true : false,
+                        sc: CurrentGameMode == "Softcore" ? true : false,
+                        
+                    }
+                    
+                    var item = results[i]
+                    
+                    if( 
+                        (item.ladder == checks.ladder ) && 
+                        (item.lod == checks.lod) &&
+                        (item.sc == checks.sc )
+                        
+                    )
+                    $addItem(results[i])
+        
+                }
+                $(window).scrollTop(y);
+                window.loadMoreItem = loadMoreItem;
+            })
+        }
+        
+        var account = $("#accountSelect").val();
+        var character = $("#characterSelect").val()
+        if(character == "AutoLoad" && account == "AutoLoad"){
+            var accList = [];
+            
+            for(var i in listOfAccounts){
+                accList.push(i);
+            }
+            var accountListid = 0;
+            var charListid = 0;
+            var ended = false;
+            window.loadMoreItem = function(){
+                if(accountListid == accList.length){
+                    if(!ended){
+                        $("#itemsList").append("<div>End Of Items on Accounts</div>");
+                        ended= true;
+                        window.loadMoreItem = false;
+                    }
+                    return;
+                } 
+                if(charListid == listOfAccounts[accList[accountListid]].length){
+                    accountListid = accountListid+1;
+                    charListid = 0;
+                    return;
+                } 
+                var acc = accList[accountListid];
+                var char = listOfAccounts[accList[accountListid]][charListid];
+                charListid = charListid+1;
+                doQuery(acc,char,window.loadMoreItem);
+            };
+        }else if(character == "AutoLoad" && account != "AutoLoad"){
+            var charList = [];
+            
+            $("#characterSelect").find("option").each(function( index ) {
+              charList.push(this.innerText);
+            });
+            
+            var charListid = 1
+            var ended = false;
+            window.loadMoreItem = function(){
+                if(charListid == charList.length){
+                    if(!ended){
+                        $("#itemsList").append("<div>End Of Items on Account</div>");
+                        ended= true;
+                    }
+                    return;
+                } 
+                var char = charList[charListid];
+                charListid = charListid+1;
+                doQuery($("#accountSelect").val(),char,window.loadMoreItem);
+            };
+        }else
+            doQuery($("#accountSelect").val(),character)
+    }
+    
+    function pupulateAccountCharSelect(realm){
+        API.accounts(realm, function(err, results) {
+            var FirstLoad = false;
+            
+            listOfAccounts = {};
+            
+            for (var q in results) {
+                var res = results[q].split("\\")
+                
+                if(!listOfAccounts[res[1]]) listOfAccounts[res[1]] = [];
+                
+                listOfAccounts[res[1]].push(res[2]);
+            }
+            
+            $("#characterSelect").html("")
+            var csoption = $("<option/>");
+            csoption.text("AutoLoad")
+
+            $("#characterSelect").append(csoption)
+            
+            
+            $("#accountSelect").append("")
+            var asoption = $("<option/>");
+            asoption.text("AutoLoad")
+
+            $("#accountSelect").append(asoption)
+            
+            for (var i in listOfAccounts) {
+    
+                var asoption = $("<option/>");
+                asoption.text(i)
+    
+                $("#accountSelect").append(asoption)
+                
+                if (!FirstLoad) {
+                    
+                        
+                    for (var j in listOfAccounts[i]) {
+    
+                        var csoption = $("<option/>");
+                        csoption.text(listOfAccounts[i][j])
+    
+                        $("#characterSelect").append(csoption)
+    
+                    }
+                    FirstLoad = true;
+                }
+            }
+    
+            addItemstoList();
+    
+        })
+    }
+    function start() {
+        API.accounts(false,function(err, results) {
+            console.log(results)
+        })
+        //get previous data
+        CurrentRealm = window.localStorage.getItem("CurrentRealm")
+        if(!CurrentRealm){
+            window.localStorage.setItem("CurrentRealm","USEast")
+            CurrentRealm = window.localStorage.getItem("CurrentRealm")
+        }
+        
+        CurrentGameType = window.localStorage.getItem("CurrentGameType")
+        if(!CurrentGameType){
+            window.localStorage.setItem("CurrentGameType","Lod")
+            CurrentGameType = window.localStorage.getItem("CurrentGameType")
+        }
+        
+        CurrentGameMode = window.localStorage.getItem("CurrentGameMode")
+        if(!CurrentGameMode){
+            window.localStorage.setItem("CurrentGameMode","Softcore")
+            CurrentGameMode = window.localStorage.getItem("CurrentGameMode")
+        }
+        
+        
+        CurrentGameClass = window.localStorage.getItem("CurrentGameClass")
+        if(!CurrentGameClass){
+            window.localStorage.setItem("CurrentGameClass","Ladder")
+            CurrentGameClass = window.localStorage.getItem("CurrentGameClass")
+        }
+        
+        //set button state
+        $(".gameRealm-"+CurrentRealm).addClass("btn-primary");
+        $(".gameType-"+CurrentGameType).addClass("btn-primary");
+        $(".gameMode-"+CurrentGameMode).addClass("btn-primary");
+        $(".gameClass-"+CurrentGameClass).addClass("btn-primary");
+        
+        $(".gameRealm").click(function(){
+            $(".gameRealm").removeClass("btn-primary")
+            $(this).addClass("btn-primary")
+            CurrentRealm = $(this).text()
+            window.localStorage.setItem("CurrentRealm",CurrentRealm)
+            refreshList()
+        })
+        
+        $(".gameType").click(function(){
+            $(".gameType").removeClass("btn-primary")
+            $(this).addClass("btn-primary")
+            CurrentGameType = $(this).text()
+            window.localStorage.setItem("CurrentGameType",CurrentGameType)
+            refreshList()
+        })
+        
+        $(".gameMode").click(function(){
+            $(".gameMode").removeClass("btn-primary")
+            $(this).addClass("btn-primary")
+            CurrentGameMode = $(this).text()
+            window.localStorage.setItem("CurrentGameMode",CurrentGameMode)
+            refreshList()
+        })
+        
+        $(".gameClass").click(function(){
+            $(".gameClass").removeClass("btn-primary")
+            $(this).addClass("btn-primary")
+            CurrentGameClass = $(this).text()
+            window.localStorage.setItem("CurrentGameClass",CurrentGameClass)
+            refreshList()
+        })
+            
+        
+        
+        pupulateAccountCharSelect(CurrentRealm);
+        
+    
+    }
+    start();
+})
+
+$(function(){
+    
+    setInterval(function(){
+        if($("#loadMore").visible()){
+            if(window.loadMoreItem)
+                window.loadMoreItem();
+        }
+    },10)
 })
