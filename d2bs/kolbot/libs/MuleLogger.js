@@ -100,7 +100,7 @@ var MuleLogger = {
 			color = -1,
 			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]|\/|\\/, "").trim();
 
-		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid;
+		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y;
 		color = unit.getColor();
 
 		switch (unit.quality) {
@@ -367,8 +367,9 @@ var MuleLogger = {
 				}
 			}
 		}
-
-		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + ".txt", finalString);
+		// hcl = hardcore class ladder
+		// sen = softcore expan nonladder
+		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + "." + ( me.playertype ? "h" : "s" ) + (me.gametype ? "e" : "c" ) + ( me.ladder > 0 ? "l" : "n" ) + "txt", finalString);
 		print("Item logging done.");
 	}
 };
