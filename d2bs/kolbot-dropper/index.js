@@ -1,5 +1,32 @@
+/* global $ */
 $(function() {
 
+	(function enableBackToTop () {
+		var backToTop = $('<a>', { id: 'back-to-top', href: '#top' });
+		var icon = $('<i>', { class: 'icon-chevron-up' });
+
+		backToTop.appendTo ('body');
+		icon.appendTo (backToTop);
+		
+	    backToTop.hide();
+
+	    $(window).scroll(function () {
+	        if ($(this).scrollTop() > 150) {
+	            backToTop.fadeIn ();
+	        } else {
+	            backToTop.fadeOut ();
+	        }
+	    });
+
+	    backToTop.click (function (e) {
+	    	e.preventDefault ();
+
+	        $('body, html').animate({
+	            scrollTop: 0
+	        }, 600);
+	    });
+	})()
+	
     /*
      *  base64.js
      *
@@ -13,7 +40,7 @@ $(function() {
         typeof exports === 'object' && typeof module !== 'undefined'
             ? module.exports = factory(global)
             : typeof define === 'function' && define.amd
-            ? define(factory) : factory(global)
+            ? define(factory) : factory(global);
     }((
         typeof self !== 'undefined' ? self
             : typeof window !== 'undefined' ? window
@@ -89,11 +116,11 @@ $(function() {
             buffer.from && Uint8Array && buffer.from !== Uint8Array.from
             ? function (u) {
                 return (u.constructor === buffer.constructor ? u : buffer.from(u))
-                    .toString('base64')
+                    .toString('base64');
             }
             :  function (u) {
                 return (u.constructor === buffer.constructor ? u : new  buffer(u))
-                    .toString('base64')
+                    .toString('base64');
             }
             : function (u) { return btoa(utob(u)) }
         ;
@@ -201,15 +228,15 @@ $(function() {
             global.Base64.extendString = function () {
                 Object.defineProperty(
                     String.prototype, 'fromBase64', noEnum(function () {
-                        return decode(this)
+                        return decode(this);
                     }));
                 Object.defineProperty(
                     String.prototype, 'toBase64', noEnum(function (urisafe) {
-                        return encode(this, urisafe)
+                        return encode(this, urisafe);
                     }));
                 Object.defineProperty(
                     String.prototype, 'toBase64URI', noEnum(function () {
-                        return encode(this, true)
+                        return encode(this, true);
                     }));
             };
         }
@@ -229,429 +256,345 @@ $(function() {
             define([], function(){ return global.Base64 });
         }
         // that's it!
-        return {Base64: global.Base64}
+        return {Base64: global.Base64};
     }));
     
     var API = (function() {
         // store/retreieve/delete for the temp storage, accounts, profiles, query and start
         function Api() {}
-
         Api.prototype.$get = function(requestObject, done, fail) {
-            var Base64blob = window.Base64.encode(JSON.stringify(requestObject))
+            var thejson = JSON.stringify(requestObject);
+            var Base64blob = window.Base64.encode(JSON.stringify(requestObject));
+            console.log(thejson);
+            console.log(Base64blob);
             var $request = {
                 url: "/" + Base64blob,
                 method: "GET",
                 dataType: "json"
-            }
+            };
             var request = $.ajax($request);
             request.done(function(msg) {
-                if (done)
-                    done(msg, request);
+                if (done) done(msg, request);
             });
             request.fail(function(jqXHR, textStatus) {
-                if (fail)
-                    fail(jqXHR, textStatus, request);
+                if (fail) fail(jqXHR, textStatus, request);
             });
-        }
-
+        };
         //theClientApi
         Api.prototype.set = function(key, val, done) {
             var self = this;
-
-            self.$get({profile:"web",func:"set",key:key,value:val}, function(msg, request) {
-                done(null, msg)
+            self.$get({ profile: "web", func: "set", key: key, value: val }, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-            
-        }
+                done(textStatus);
+            });
+        };
         Api.prototype.get = function(key, done) {
             var self = this;
-
-            self.$get({func:"get",key:key}, function(msg, request) {
-                done(null, msg)
+            self.$get({ func: "get", key: key }, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
+                done(textStatus);
+            });
+        };
         Api.prototype.accounts = function(account, done) {
             var self = this;
             var args = [];
-            if(account)
-                args.push(account)
-            
-            self.$get({profile:"web",func:"accounts",args:args}, function(msg, request) {
-                done(null, msg)
+            if (account) args.push(account);
+            self.$get({ profile: "web", func: "accounts", args: args }, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
+                done(textStatus);
+            });
+        };
         Api.prototype.profiles = function(done) {
             var self = this;
-            self.$get({profile:"web",func:"profiles",args:[""]}, function(msg, request) {
-                done(null, msg)
+            self.$get({ profile: "web", func: "profiles", args: [""] }, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
-        Api.prototype.query = function(item,realm,account,charname, done) {
+                done(textStatus);
+            });
+        };
+        Api.prototype.query = function(item, realm, account, charname, done) {
             var self = this;
             var args = [];
-            if(item) args.push(item); else args.push("");
-            if(realm) args.push(realm); else args.push("");
-            if(account) args.push(account); //else args.push("");
-            if(charname) args.push(charname); //else args.push("");
-            
-            self.$get({profile:"web",func:"query",args:args}, function(msg, request) {
-                done(null, msg)
+            if (item) args.push(item);
+            else args.push("");
+            if (realm) args.push(realm);
+            else args.push("");
+            if (account) args.push(account); //else args.push("");
+            if (charname) args.push(charname); //else args.push("");
+            self.$get({ profile: "web", func: "query", args: args }, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
-
+                done(textStatus);
+            });
+        };
         Api.prototype.start = function(queryObject, done) {
             var self = this;
-            var query = "?profile=" + queryObject.profile +
-                (queryObject.data ? "&data=" + window.Base64.encode(queryObject.data) : "");
-
-            self.$get("/start"+query, function(msg, request) {
-                done(null, msg)
+            var query = "?profile=" + queryObject.profile + (queryObject.data ? "&data=" + window.Base64.encode(queryObject.data) : "");
+            self.$get("/start" + query, function(msg, request) {
+                done(null, msg);
             }, function(jqXHR, textStatus) {
-                done(textStatus)
-            })
-        }
-
+                done(textStatus);
+            });
+        };
         return new Api();
-    })()
-    
+    })();
     var CurrentRealm;
     var CurrentGameType;
     var CurrentGameMode;
     var CurrentGameClass;
-    
     window.API = API;
-    
     var listOfAccounts = {};
-    
-    $("#accountSelect").change(function(){
-        $("#characterSelect").html("")
+    $("#accountSelect").change(function() {
+        $("#characterSelect").html("");
         var $thisAccount = $(this).val();
-        
         var csoption = $("<option/>");
-        csoption.text("AutoLoad")
-        $("#characterSelect").append(csoption)
-        
+        csoption.text("AutoLoad");
+        $("#characterSelect").append(csoption);
         for (var j in listOfAccounts[$thisAccount]) {
-
-            var csoption = $("<option/>");
-            csoption.text(listOfAccounts[$thisAccount][j])
-
-            $("#characterSelect").append(csoption)
-
+            csoption = $("<option/>");
+            csoption.text(listOfAccounts[$thisAccount][j]);
+            $("#characterSelect").append(csoption);
         }
-        
-        refreshList()
-    })
+        refreshList();
+    });
     $("#searchItem").change(function() {
-       refreshList()
-    })
+        refreshList();
+    });
     $("#searchItem").keyup(function() {
-       refreshList()
-    })
-    $("#characterSelect").change(function(){
-       refreshList()
-    })
+        refreshList();
+    });
+    $("#characterSelect").change(function() {
+        refreshList();
+    });
     
-    function refreshList(){
+    function refreshList() {
         window.loadMoreItem = false;
         $("#itemsList").html("");
-        addItemstoList()
+        addItemstoList();
     }
+    
     function cleanDecription(description) {
-        var desc = description.toString()
+        var desc = description.toString();
         var $desc;
-        
         $desc = desc.split(/\r\n|\r|\n/g);
-        desc = $desc.join("<br/>")
-        
+        desc = $desc.join("<br/>");
         $desc = desc.split("$");
-        desc = $desc[0]
-        
-        desc = encodeURIComponent(desc)
-        $desc = desc.split(/%3Fc0/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc1/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc2/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc3/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc4/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc5/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc6/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc7/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc8/g); 
-        desc = $desc.join("")
-        $desc = desc.split(/%3Fc9/g); 
-        desc = $desc.join("")
-        desc = decodeURIComponent(desc)
-        
+        desc = $desc[0];
+        desc = encodeURIComponent(desc);
+        $desc = desc.split(/%3Fc0/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc1/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc2/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc3/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc4/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc5/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc6/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc7/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc8/g);
+        desc = $desc.join("");
+        $desc = desc.split(/%3Fc9/g);
+        desc = $desc.join("");
+        desc = decodeURIComponent(desc);
         return desc;
     }
     
-
-    function $addItem(result){
-        var itemUID = result.description.split("$")[1]
-            var htmlTemplate = '<div class="row itemsListitem">' +
-                '<div class="span2 "><img src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> </div>' +
-                '<div class="span5">' + cleanDecription(result.description) + '</div>' +
-                '<div class="span5">' + 
-                    
-                    CurrentRealm+"/"+ result.account + "/" + result.character +"/{"+itemUID+'}'+ "<br/>" +
-                    
-                    (result.lod ? "Lod" : "Classic")+"/"+(result.sc ? "Softcore" : "Hardcore")+"/"+(result.ladder ? "Ladder" : "NonLadder" )+
-                    
-                    
-                '</div>' +
-                '</div><hr>'
-
-            var $item = $(htmlTemplate);
-            $item.click(function() {
-                $(this).toggleClass("selected")
-            })
-            $("#itemsList").append($item);
+    function $addItem(result) {
+        var itemUID = result.description.split("$")[1];
+        var htmlTemplate = '<div class="row itemsListitem">' + '<div class="span2 "><img src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> </div>' + '<div class="span5">' + cleanDecription(result.description) + '</div>' + '<div class="span5">' + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + '}' + "<br/>" + (result.lod ? "Lod" : "Classic") + "/" + (result.sc ? "Softcore" : "Hardcore") + "/" + (result.ladder ? "Ladder" : "NonLadder") + '</div>' + '</div><hr>';
+        var $item = $(htmlTemplate);
+        $item.click(function() {
+            $(this).toggleClass("selected");
+        });
+        $("#itemsList").append($item);
+    }
+    
+    function buildregex(str) {
+        var $str = str.split(" ");
+        var $$str = "";
+        for (var i in $str) {
+            $$str += "(?=.*" + $str[i] + ")";
+        }
+        return $$str;
     }
     
     function addItemstoList() {
-        
-        function doQuery($account, $character,loadMoreItem){
+        function doQuery($account, $character, loadMoreItem) {
             window.loadMoreItem = false;
-            
-            API.query($("#searchItem").val(), CurrentRealm, $account, $character, function(err, results) {
-                //console.log(results)
-                var itemsList = $("#itemsList");
-                
-                var y = $(window).scrollTop();  //your current y position on the page
-                
+            API.query(buildregex($("#searchItem").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function(err, results) {
+                if (err) console.log(err);
+                var y = $(window).scrollTop();
                 for (var i in results) {
-                    var checks = {
-                        ladder: CurrentGameClass == "Ladder" ? true : false,
-                        lod: CurrentGameType == "Lod" ? true : false,
-                        sc: CurrentGameMode == "Softcore" ? true : false,
-                        
-                    }
-                    
-                    var item = results[i]
-                    
-                    if( 
-                        (item.ladder == checks.ladder ) && 
-                        (item.lod == checks.lod) &&
-                        (item.sc == checks.sc )
-                        
-                    )
-                    $addItem(results[i])
-        
+                    $addItem(results[i]);
                 }
                 $(window).scrollTop(y);
                 window.loadMoreItem = loadMoreItem;
-            })
+            });
         }
-        
+        var charListid, ended;
         var account = $("#accountSelect").val();
-        var character = $("#characterSelect").val()
-        if(character == "AutoLoad" && account == "AutoLoad"){
+        var character = $("#characterSelect").val();
+        if (character == "AutoLoad" && account == "AutoLoad") {
             var accList = [];
-            
-            for(var i in listOfAccounts){
+            for (var i in listOfAccounts) {
                 accList.push(i);
             }
             var accountListid = 0;
-            var charListid = 0;
-            var ended = false;
-            window.loadMoreItem = function(){
-                if(accountListid == accList.length){
-                    if(!ended){
+            charListid = 0;
+            ended = false;
+            window.loadMoreItem = function() {
+                if (accountListid == accList.length) {
+                    if (!ended) {
                         $("#itemsList").append("<div>End Of Items on Accounts</div>");
-                        ended= true;
+                        ended = true;
                         window.loadMoreItem = false;
                     }
                     return;
-                } 
-                if(charListid == listOfAccounts[accList[accountListid]].length){
-                    accountListid = accountListid+1;
+                }
+                if (charListid == listOfAccounts[accList[accountListid]].length) {
+                    accountListid = accountListid + 1;
                     charListid = 0;
                     return;
-                } 
+                }
                 var acc = accList[accountListid];
                 var char = listOfAccounts[accList[accountListid]][charListid];
-                charListid = charListid+1;
-                doQuery(acc,char,window.loadMoreItem);
+                charListid = charListid + 1;
+                doQuery(acc, char, window.loadMoreItem);
             };
-        }else if(character == "AutoLoad" && account != "AutoLoad"){
+        }
+        else if (character == "AutoLoad" && account != "AutoLoad") {
             var charList = [];
-            
-            $("#characterSelect").find("option").each(function( index ) {
-              charList.push(this.innerText);
+            $("#characterSelect").find("option").each(function(index) {
+                charList.push(this.innerText);
             });
-            
-            var charListid = 1
-            var ended = false;
-            window.loadMoreItem = function(){
-                if(charListid == charList.length){
-                    if(!ended){
+            charListid = 1;
+            ended = false;
+            window.loadMoreItem = function() {
+                if (charListid == charList.length) {
+                    if (!ended) {
                         $("#itemsList").append("<div>End Of Items on Account</div>");
-                        ended= true;
+                        ended = true;
                     }
                     return;
-                } 
-                var char = charList[charListid];
-                charListid = charListid+1;
-                doQuery($("#accountSelect").val(),char,window.loadMoreItem);
-            };
-        }else
-            doQuery($("#accountSelect").val(),character)
-    }
-    
-    function pupulateAccountCharSelect(realm){
-        API.accounts(realm, function(err, results) {
-            var FirstLoad = false;
-            
-            listOfAccounts = {};
-            
-            for (var q in results) {
-                var res = results[q].split("\\")
-                
-                if(!listOfAccounts[res[1]]) listOfAccounts[res[1]] = [];
-                
-                listOfAccounts[res[1]].push(res[2]);
-            }
-            
-            $("#characterSelect").html("")
-            var csoption = $("<option/>");
-            csoption.text("AutoLoad")
-
-            $("#characterSelect").append(csoption)
-            
-            
-            $("#accountSelect").append("")
-            var asoption = $("<option/>");
-            asoption.text("AutoLoad")
-
-            $("#accountSelect").append(asoption)
-            
-            for (var i in listOfAccounts) {
-    
-                var asoption = $("<option/>");
-                asoption.text(i)
-    
-                $("#accountSelect").append(asoption)
-                
-                if (!FirstLoad) {
-                    
-                        
-                    for (var j in listOfAccounts[i]) {
-    
-                        var csoption = $("<option/>");
-                        csoption.text(listOfAccounts[i][j])
-    
-                        $("#characterSelect").append(csoption)
-    
-                    }
-                    FirstLoad = true;
                 }
-            }
-    
-            addItemstoList();
-    
-        })
+                var char = charList[charListid];
+                charListid = charListid + 1;
+                doQuery($("#accountSelect").val(), char, window.loadMoreItem);
+            };
+        }
+        else doQuery($("#accountSelect").val(), character);
     }
-    function start() {
-        API.accounts(false,function(err, results) {
-            console.log(results)
-        })
-        //get previous data
-        CurrentRealm = window.localStorage.getItem("CurrentRealm")
-        if(!CurrentRealm){
-            window.localStorage.setItem("CurrentRealm","USEast")
-            CurrentRealm = window.localStorage.getItem("CurrentRealm")
-        }
-        
-        CurrentGameType = window.localStorage.getItem("CurrentGameType")
-        if(!CurrentGameType){
-            window.localStorage.setItem("CurrentGameType","Lod")
-            CurrentGameType = window.localStorage.getItem("CurrentGameType")
-        }
-        
-        CurrentGameMode = window.localStorage.getItem("CurrentGameMode")
-        if(!CurrentGameMode){
-            window.localStorage.setItem("CurrentGameMode","Softcore")
-            CurrentGameMode = window.localStorage.getItem("CurrentGameMode")
-        }
-        
-        
-        CurrentGameClass = window.localStorage.getItem("CurrentGameClass")
-        if(!CurrentGameClass){
-            window.localStorage.setItem("CurrentGameClass","Ladder")
-            CurrentGameClass = window.localStorage.getItem("CurrentGameClass")
-        }
-        
-        //set button state
-        $(".gameRealm-"+CurrentRealm).addClass("btn-primary");
-        $(".gameType-"+CurrentGameType).addClass("btn-primary");
-        $(".gameMode-"+CurrentGameMode).addClass("btn-primary");
-        $(".gameClass-"+CurrentGameClass).addClass("btn-primary");
-        
-        $(".gameRealm").click(function(){
-            $(".gameRealm").removeClass("btn-primary")
-            $(this).addClass("btn-primary")
-            CurrentRealm = $(this).text()
-            window.localStorage.setItem("CurrentRealm",CurrentRealm)
-            refreshList()
-        })
-        
-        $(".gameType").click(function(){
-            $(".gameType").removeClass("btn-primary")
-            $(this).addClass("btn-primary")
-            CurrentGameType = $(this).text()
-            window.localStorage.setItem("CurrentGameType",CurrentGameType)
-            refreshList()
-        })
-        
-        $(".gameMode").click(function(){
-            $(".gameMode").removeClass("btn-primary")
-            $(this).addClass("btn-primary")
-            CurrentGameMode = $(this).text()
-            window.localStorage.setItem("CurrentGameMode",CurrentGameMode)
-            refreshList()
-        })
-        
-        $(".gameClass").click(function(){
-            $(".gameClass").removeClass("btn-primary")
-            $(this).addClass("btn-primary")
-            CurrentGameClass = $(this).text()
-            window.localStorage.setItem("CurrentGameClass",CurrentGameClass)
-            refreshList()
-        })
-            
-        
-        
-        pupulateAccountCharSelect(CurrentRealm);
-        
     
+    function pupulateAccountCharSelect(realm, core, type, ladder) {
+        API.accounts(realm, function(err, results) {
+            if (err) console.log(err);
+            listOfAccounts = {};
+            for (var q in results) {
+                var res = results[q].split("\\");
+                if (!listOfAccounts[res[1]]) listOfAccounts[res[1]] = [];
+                var charkey = res[2].split(".")[1];
+                var checks = {
+                    ladder: CurrentGameClass == "Ladder" ? true : false,
+                    lod: CurrentGameType == "Lod" ? true : false,
+                    sc: CurrentGameMode == "Softcore" ? true : false
+                }
+                var charCheck = {
+                    ladder: charkey[2] == "l" ? true : false,
+                    lod: charkey[1] == "e" ? true : false,
+                    sc: charkey[0] == "s" ? true : false
+                }
+                if (
+                    (charCheck.ladder == checks.ladder) && (charCheck.lod == checks.lod) && (charCheck.sc == checks.sc)) listOfAccounts[res[1]].push(res[2]);
+            }
+            $("#characterSelect").html("");
+            $("#accountSelect").html("");
+            var csoption = $("<option/>");
+            csoption.text("AutoLoad");
+            $("#characterSelect").append(csoption);
+            $("#accountSelect").append("");
+            var asoption = $("<option/>");
+            asoption.text("AutoLoad");
+            $("#accountSelect").append(asoption);
+            for (var i in listOfAccounts) {
+                asoption = $("<option/>");
+                asoption.text(i);
+                $("#accountSelect").append(asoption);
+            }
+            refreshList();
+        });
+    }
+    
+    function start() {
+        CurrentRealm = window.localStorage.getItem("CurrentRealm");
+        if (!CurrentRealm) {
+            window.localStorage.setItem("CurrentRealm", "USEast");
+            CurrentRealm = window.localStorage.getItem("CurrentRealm");
+        }
+        CurrentGameType = window.localStorage.getItem("CurrentGameType");
+        if (!CurrentGameType) {
+            window.localStorage.setItem("CurrentGameType", "Lod");
+            CurrentGameType = window.localStorage.getItem("CurrentGameType");
+        }
+        CurrentGameMode = window.localStorage.getItem("CurrentGameMode");
+        if (!CurrentGameMode) {
+            window.localStorage.setItem("CurrentGameMode", "Softcore");
+            CurrentGameMode = window.localStorage.getItem("CurrentGameMode");
+        }
+        CurrentGameClass = window.localStorage.getItem("CurrentGameClass");
+        if (!CurrentGameClass) {
+            window.localStorage.setItem("CurrentGameClass", "Ladder");
+            CurrentGameClass = window.localStorage.getItem("CurrentGameClass");
+        }
+        //set button state
+        $(".gameRealm-" + CurrentRealm).addClass("btn-primary");
+        $(".gameType-" + CurrentGameType).addClass("btn-primary");
+        $(".gameMode-" + CurrentGameMode).addClass("btn-primary");
+        $(".gameClass-" + CurrentGameClass).addClass("btn-primary");
+        $(".gameRealm").click(function() {
+            $(".gameRealm").removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+            CurrentRealm = $(this).text();
+            window.localStorage.setItem("CurrentRealm", CurrentRealm);
+            pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
+        });
+        $(".gameType").click(function() {
+            $(".gameType").removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+            CurrentGameType = $(this).text();
+            window.localStorage.setItem("CurrentGameType", CurrentGameType);
+            pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
+        });
+        $(".gameMode").click(function() {
+            $(".gameMode").removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+            CurrentGameMode = $(this).text();
+            window.localStorage.setItem("CurrentGameMode", CurrentGameMode);
+            pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
+        });
+        $(".gameClass").click(function() {
+            $(".gameClass").removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+            CurrentGameClass = $(this).text();
+            window.localStorage.setItem("CurrentGameClass", CurrentGameClass);
+            pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
+        });
+        pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
     }
     start();
-})
-
-$(function(){
-    
-    setInterval(function(){
-        if($("#loadMore").visible()){
-            if(window.loadMoreItem)
-                window.loadMoreItem();
+});
+$(function() {
+    setInterval(function() {
+        if ($("#loadMore").visible()) {
+            if (window.loadMoreItem) window.loadMoreItem();
         }
-    },10)
+    }, 10);
 })
