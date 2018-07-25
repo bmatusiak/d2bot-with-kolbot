@@ -11,11 +11,13 @@
 	<link href="./theme/css/bootstrap.min.css" rel="stylesheet">
 	<link href="./theme/css/bootstrap-responsive.min.css" rel="stylesheet">
 
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">
+	<!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">-->
 	<link href="./theme/css/font-awesome.min.css" rel="stylesheet">
 
 	<link href="./theme/css/ui-lightness/jquery-ui-1.10.0.custom.min.css" rel="stylesheet">
 
+	<link href="./theme/js/plugins/msgGrowl/css/msgGrowl.css" rel="stylesheet">
+	
 	<link href="./theme/css/base-admin-2.css" rel="stylesheet">
 	<link href="./theme/css/base-admin-2-responsive.css" rel="stylesheet">
 
@@ -28,6 +30,29 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 	<style>
+	.itemImg {
+		background-color:rgba(41,41,41, 0.6);
+		box-shadow: 0px 0px 20px 20px rgba(41,41,41, 0.6);
+	}
+	body{
+		background:#292929;
+	}
+	
+	
+		.widget .widget-header h3 {
+			color:#CCC;
+		}
+		.widget .widget-header {
+	  	    background-color: #1b1b1b;
+		    background-image: -moz-linear-gradient(top,#222,#111);
+		    background-image: -webkit-gradient(linear,0 0,0 100%,from(#222),to(#111));
+		    background-image: -webkit-linear-gradient(top,#222,#111);
+		    background-image: -o-linear-gradient(top,#222,#111);
+		    background-image: linear-gradient(to bottom,#222,#111);
+		    background-repeat: repeat-x;
+		    border-color: #252525;
+		}
+
 		.widget-content.itemsList  > div {
 			margin:0;
 		}
@@ -68,13 +93,13 @@
 			
 			.left-static-col{
 				position: fixed;
-			    top: 57px;
+			    top: 62px;
 			    left: 0;
 			}
 			
 			.right-static-col{
 				position: fixed;
-			    top: 57px;
+			    top: 62px;
 			    right: 0;
 			}
 		}
@@ -82,7 +107,7 @@
 </head>
 
 <body>
-	<div style="width:100%;height:57px"></div>
+	<div style="width:100%;height:62px"></div>
 	<div class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom:0px;position:fixed;top:0;margin:0">
 
 		<div class="navbar-inner">
@@ -94,32 +119,15 @@
 			</a>
 
 				<a class="brand" href="/">
-				Kolbot Dropper <sup>1.0</sup>
+				LimeDrop <sup>1.0</sup>
 			</a>
+		
+			<form class="navbar-search pull-right" onsubmit="javascirpt: return false;">
+				<input type="text" class="search-query hidden-phone" placeholder="Filter Items" id="topSearch">
+			</form>
 			
-			<div class="nav-collapse collapse">
+			<!--<div class="nav-collapse collapse">-->
 				
-				<div class="pull-right" id="gameRealm">
-					<div class="btn-group" id="realm">
-					  <button class="btn gameRealm gameRealm-USEast">USEast</button>
-					  <button class="btn gameRealm gameRealm-USWest">USWest</button>
-					</div>
-					
-					<div class="btn-group" id="gameType">
-					  <button class="btn gameType gameType-Lod">Lod</button>
-					  <button class="btn gameType gameType-Classic">Classic</button>
-					</div>
-					
-					<div class="btn-group" id="gameMode">
-					  <button class="btn gameMode gameMode-Softcore">Softcore</button>
-					  <button class="btn gameMode gameMode-Hardcore">Hardcore</button>
-					</div>
-					
-					<div class="btn-group" id="gameClass">
-					  <button class="btn gameClass gameClass-Ladder">Ladder</button>
-					  <button class="btn gameClass gameClass-NonLadder">NonLadder</button>
-					</div>
-				</div>
 				<!--<ul class="nav">-->
 				<!--	<li class="dropdown">-->
 			
@@ -146,7 +154,7 @@
 			
 				<!--</ul>-->
 			
-			</div>
+			<!--</div>-->
 			<!--/.nav-collapse -->
 
 			</div>
@@ -175,13 +183,30 @@
 
 					<div class="widget stacked">
 
-						<div class="widget-header">
-							<h3>Account Select</h3>
-						</div>
-						<!-- /widget-header -->
-
-						<div class="widget-content">
-
+						<div class="widget-content"  style="text-align: center;">
+			
+							<div class="" id="gameRealm">
+								<div class="btn-group" id="realm">
+								  <button class="btn gameRealm gameRealm-USEast">USEast</button>
+								  <button class="btn gameRealm gameRealm-USWest">USWest</button>
+								</div><br/><br/>
+								
+								<div class="btn-group" id="gameType">
+								  <button class="btn gameType gameType-Lod">Lod</button>
+								  <button class="btn gameType gameType-Classic">Classic</button>
+								</div><br/><br/>
+								
+								<div class="btn-group" id="gameMode">
+								  <button class="btn gameMode gameMode-Softcore">Softcore</button>
+								  <button class="btn gameMode gameMode-Hardcore">Hardcore</button>
+								</div><br/><br/>
+								
+								<div class="btn-group" id="gameClass">
+								  <button class="btn gameClass gameClass-Ladder">Ladder</button>
+								  <button class="btn gameClass gameClass-NonLadder">NonLadder</button>
+								</div><br/><br/>
+							</div>
+				
 							<select class="span12" id="accountSelect">
 								<!--<option>AccountName</option>-->
 							</select>
@@ -191,6 +216,11 @@
 								<!--<option>CharacterName</option>-->
 							</select>
 							
+							<div class="btn-group" id="gameClass">
+							  <button class="btn addMule" id="addMule">addMule</button>
+							  
+							</div>
+							
 						</div>
 						<!-- /widget-content -->
 
@@ -198,20 +228,6 @@
 					<!-- /widget -->
 					
 					
-					<div class="widget stacked">
-
-						<div class="widget-header">
-							<h3>Item Drop Queue</h3>
-						</div>
-						<!-- /widget-header -->
-
-						<div class="widget-content">
-
-							
-						</div>
-						<!-- /widget-content -->
-
-					</div>
 					<!-- /widget -->
 
 				</div>
@@ -219,17 +235,12 @@
 
 				<div class="span7">
 
-					<div class="widget stacked">
-
-						<div class="widget-header">
-							<h3>Quick Search</h3>
-						</div>
-						<!-- /widget-header -->
+					<div class="widget stacked visible-phone">
 
 						<div class="widget-content">
 
 
-							<input type="text" class="input-medium search-query span6" id="searchItem" />
+							<input type="text" class="input-medium search-query span12 pull-right" id="searchItem" />
 						</div>
 						<!-- /widget-content -->
 
@@ -237,11 +248,6 @@
 					<!-- /widget -->
 					
 					<div class="widget stacked">
-
-						<div class="widget-header">
-							<h3>Item List</h3>
-						</div>
-						<!-- /widget-header -->
 
 						<div class="widget-content itemsList" id="itemsList">
 							
@@ -263,24 +269,6 @@
 
 					<div class="widget stacked">
 
-						<div class="widget-header">
-							<h3>Notifications</h3>
-						</div>
-						<!-- /widget-header -->
-
-						<div class="widget-content">
-
-
-							<textarea style="width:100%;min-width:100%;max-width:100%;padding-right: 0px;height:100px"></textarea>
-						</div>
-						<!-- /widget-content -->
-
-					</div>
-					<!-- /widget -->
-
-
-					<div class="widget stacked">
-
 						<div class="widget-content">
 							<form class="form-horizontal">
 								<input class="span12" type="text" placeholder="GameName"><br/><br/>
@@ -296,6 +284,15 @@
 					</div>
 					<!-- /widget -->
 
+					<div class="widget stacked">
+						<!-- /widget-header -->
+
+						<div class="widget-content" style="text-align: center;">
+							Passed Dropped Items Will Display Here
+						</div>
+						<!-- /widget-content -->
+
+					</div>
 				</div>
 				<!-- /span6 -->
 
@@ -311,6 +308,49 @@
 
 
 
+<div class="modal fade hide" id="modelDialog"></div>
+
+<div class="hide" id="template-askPass">
+	
+<div class="modal-header">
+		<h3>Enter Password</h3>
+	</div>
+	<div class="modal-body">
+		<div class="container-fluid">
+			<div class="row-fluid">
+				Please enter Password
+				<input type="password" class="span12" placeholder="Password" /> 
+  			</div>
+		</div>
+	</div>
+	<div class="modal-footer"><a href="javascript:;" class="btn btn-primary">OK</a> </div>
+</div>
+
+<div class="hide" id="template-addMule">
+	<div class="modal-header"> <button type="button" class="close" data-dismiss="modal">&times;</button>
+		<h3>Add Mule</h3>
+	</div>
+	<div class="modal-body">
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<select class="span12 realmList">
+					<option>USEast</option>
+					<option>USWest</option>
+				</select> 
+				<hr>
+	  			<input type="text" class="span12" placeholder="Account" />
+		  		<input type="text" class="span12" placeholder="Password" /> 
+		  		<input type="text" class="span12" placeholder="CharacterName1,CharacterName2   --or leave blank for all" /> 
+		  		<div class="span12" style="text-align:center;">~or~</div>
+		  		<input type="text" class="span12" placeholder="account/password/characterName" /> 
+  				You can define characterName as "all" to log all mules on account, Sorry about that if you have a characterName called all.
+  			</div>
+		</div>
+	</div>
+	<div class="modal-footer"> <a href="javascript:;" class="btn" data-dismiss="modal">Cancel</a> <a href="javascript:;" class="btn btn-primary">OK</a> </div>
+</div>
+
+<
 
 	<!-- Le javascript
 ================================================== -->
@@ -318,7 +358,16 @@
 	<script src="./theme/js/libs/jquery-1.8.3.min.js"></script>
 	<script src="./theme/js/libs/jquery-ui-1.10.0.custom.min.js"></script>
 	<script src="./theme/js/libs/bootstrap.min.js"></script>
+	<script src="./theme/js/plugins/msgGrowl/js/msgGrowl.js"></script>
 	<script src="./jquery.visible.min.js"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/sha256.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/aes.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/hmac.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/hmac-sha256.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/pbkdf2.js"></script>
 
 	<script src="./index.js"></script>
 

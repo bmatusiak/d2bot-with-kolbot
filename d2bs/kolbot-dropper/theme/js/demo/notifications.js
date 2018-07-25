@@ -14,7 +14,8 @@ $(function () {
 		$.msgGrowl ({
 			type: $(this).attr ('data-type')
 			, title: 'Header'
-			, text: 'Lorem ipsum dolor sit amet, consectetur ipsum dolor sit amet, consectetur.'
+			, text: 'Lorem ipsum dolor sit amet, consectetur ipsum dolor sit amet, consectetur.',
+			position: 'bottom-left'
 		});
 	});
 	

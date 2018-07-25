@@ -1,6 +1,22 @@
-/* global $ */
-$(function() {
 
+/* global $ URLSearchParams*/
+window.urlParams = new URLSearchParams(window.location.search);
+$(function() {
+    
+/*--------------------------------------------------
+	Plugin: Msg Growl
+	--------------------------------------------------*/	
+	//$('.growl-type').live ('click', function (e) {
+		$.msgGrowl ({
+			type: 'warning'
+			, title: 'Notification Area'
+			, text: 'For past notifications and app errors press "F12" om google chrome, click console tab'
+			, position: 'bottom-left'
+			, sticky:true
+		});
+	//});
+	
+	
 	(function enableBackToTop () {
 		var backToTop = $('<a>', { id: 'back-to-top', href: '#top' });
 		var icon = $('<i>', { class: 'icon-chevron-up' });
@@ -259,12 +275,96 @@ $(function() {
         return {Base64: global.Base64};
     }));
     
+    //http://jsfiddle.net/Z583W/111/
+	var SessionKey;
+
+	var keySize = 256;
+	var ivSize = 128;
+	var saltSize = 256;
+	var iterations = 1000;
+
+	function encrypt (msg, pass) {
+		var salt = CryptoJS.lib.WordArray.random(saltSize/8);
+
+		var key = CryptoJS.PBKDF2(pass, salt, {
+			keySize: keySize/32,
+			iterations: iterations
+		});
+
+		var iv = CryptoJS.lib.WordArray.random(ivSize/8);
+
+		var encrypted = CryptoJS.AES.encrypt(msg, key, { 
+			iv: iv, 
+			padding: CryptoJS.pad.Pkcs7,
+			mode: CryptoJS.mode.CBC
+
+		});
+
+		var encryptedHex = base64ToHex(encrypted.toString());
+		var base64result = hexToBase64(salt + iv + encryptedHex);
+
+		return base64result;
+	}
+
+	function decrypt (transitmessage, pass) {
+		var hexResult = base64ToHex(transitmessage)
+
+		var salt = CryptoJS.enc.Hex.parse(hexResult.substr(0, 64));
+		var iv = CryptoJS.enc.Hex.parse(hexResult.substr(64, 32));
+		var encrypted = hexToBase64(hexResult.substring(96));
+
+		var key = CryptoJS.PBKDF2(pass, salt, {
+			keySize: keySize/32,
+			iterations: iterations
+		});
+
+		var decrypted = CryptoJS.AES.decrypt(encrypted, key, { 
+			iv: iv, 
+			padding: CryptoJS.pad.Pkcs7,
+			mode: CryptoJS.mode.CBC
+		});
+
+		return decrypted.toString(CryptoJS.enc.Utf8); 
+	}
+
+	function hexToBase64(str) {
+		return btoa(String.fromCharCode.apply(null,
+			str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" "))
+		);
+	}
+
+	function base64ToHex(str) {
+		for (var i = 0, bin = atob(str.replace(/[ \r\n]+$/, "")), hex = []; i < bin.length; ++i) {
+			var tmp = bin.charCodeAt(i).toString(16);
+			if (tmp.length === 1) tmp = "0" + tmp;
+			hex[hex.length] = tmp;
+		}
+
+		return hex.join("");
+	}
+	    
+    var apikey = window.urlParams.get("apikey") || "68a1s6d5f16a51sdf651asdf"; // replace this with user input from text box, clear text box after
+			
+	function getChallange(done)
+	{
+		if (SessionKey && SessionKey.length > 0)
+			done(SessionKey);
+		
+		API.challenge(function(err,challenge)
+		{
+			SessionKey = encrypt(challenge, apikey);
+			done(SessionKey);
+		});
+	}
+	
     var API = (function() {
         // store/retreieve/delete for the temp storage, accounts, profiles, query and start
         function Api() {}
         Api.prototype.$get = function(requestObject, done, fail) {
+            if (!requestObject.profile) requestObject.profile = SessionKey || "null";
             var thejson = JSON.stringify(requestObject);
             var Base64blob = window.Base64.encode(JSON.stringify(requestObject));
+            console.log("---------------------");
             console.log(thejson);
             console.log(Base64blob);
             var $request = {
@@ -274,6 +374,7 @@ $(function() {
             };
             var request = $.ajax($request);
             request.done(function(msg) {
+                console.log("results",msg)
                 if (done) done(msg, request);
             });
             request.fail(function(jqXHR, textStatus) {
@@ -283,7 +384,7 @@ $(function() {
         //theClientApi
         Api.prototype.set = function(key, val, done) {
             var self = this;
-            self.$get({ profile: "web", func: "set", key: key, value: val }, function(msg, request) {
+            self.$get({ func: "set", key: key, value: val }, function(msg, request) {
                 done(null, msg);
             }, function(jqXHR, textStatus) {
                 done(textStatus);
@@ -301,7 +402,7 @@ $(function() {
             var self = this;
             var args = [];
             if (account) args.push(account);
-            self.$get({ profile: "web", func: "accounts", args: args }, function(msg, request) {
+            self.$get({ func: "accounts", args: args }, function(msg, request) {
                 done(null, msg);
             }, function(jqXHR, textStatus) {
                 done(textStatus);
@@ -309,7 +410,7 @@ $(function() {
         };
         Api.prototype.profiles = function(done) {
             var self = this;
-            self.$get({ profile: "web", func: "profiles", args: [""] }, function(msg, request) {
+            self.$get({ func: "profiles", args: [] }, function(msg, request) {
                 done(null, msg);
             }, function(jqXHR, textStatus) {
                 done(textStatus);
@@ -324,16 +425,31 @@ $(function() {
             else args.push("");
             if (account) args.push(account); //else args.push("");
             if (charname) args.push(charname); //else args.push("");
-            self.$get({ profile: "web", func: "query", args: args }, function(msg, request) {
+            self.$get({ func: "query", args: args }, function(msg, request) {
                 done(null, msg);
             }, function(jqXHR, textStatus) {
                 done(textStatus);
             });
         };
-        Api.prototype.start = function(queryObject, done) {
+        Api.prototype.start = function(profile, tag, done) {
             var self = this;
-            var query = "?profile=" + queryObject.profile + (queryObject.data ? "&data=" + window.Base64.encode(queryObject.data) : "");
-            self.$get("/start" + query, function(msg, request) {
+            self.$get({ func: "start", args: [profile, tag] }, function(msg, request) {
+                done(null, msg);
+            }, function(jqXHR, textStatus) {
+                done(textStatus);
+            });
+        };
+        Api.prototype.stop = function(profile, tag, done) {
+            var self = this;
+            self.$get({ func: "stop", args: [profile, tag] }, function(msg, request) {
+                done(null, msg);
+            }, function(jqXHR, textStatus) {
+                done(textStatus);
+            });
+        };
+        Api.prototype.challenge = function(done) {
+            var self = this;
+            self.$get({ profile: "", func: "challenge", args: [""] }, function(msg, request) {
                 done(null, msg);
             }, function(jqXHR, textStatus) {
                 done(textStatus);
@@ -341,11 +457,16 @@ $(function() {
         };
         return new Api();
     })();
+    
     var CurrentRealm;
     var CurrentGameType;
     var CurrentGameMode;
     var CurrentGameClass;
+    
+    /* VVV to be removed VVV */
     window.API = API;
+    /* ^^^ to be removed ^^^ */
+    
     var listOfAccounts = {};
     $("#accountSelect").change(function() {
         $("#characterSelect").html("");
@@ -362,10 +483,20 @@ $(function() {
     });
     $("#searchItem").change(function() {
         refreshList();
-    });
+    });/*
     $("#searchItem").keyup(function() {
         refreshList();
-    });
+    });*/
+    
+    $("#topSearch").change(function() {
+        $("#searchItem").val($(this).val());
+        $("#searchItem").change();
+    });/*
+    $("#topSearch").keyup(function() {
+        $("#searchItem").val($(this).val())
+        $("#searchItem").change();
+    });*/
+    
     $("#characterSelect").change(function() {
         refreshList();
     });
@@ -410,7 +541,7 @@ $(function() {
     
     function $addItem(result) {
         var itemUID = result.description.split("$")[1];
-        var htmlTemplate = '<div class="row itemsListitem">' + '<div class="span2 "><img src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> </div>' + '<div class="span5">' + cleanDecription(result.description) + '</div>' + '<div class="span5">' + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + '}' + "<br/>" + (result.lod ? "Lod" : "Classic") + "/" + (result.sc ? "Softcore" : "Hardcore") + "/" + (result.ladder ? "Ladder" : "NonLadder") + '</div>' + '</div><hr>';
+        var htmlTemplate = '<div class="row itemsListitem">' + '<div class="span2 "><img class="itemImg pull-right" src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> </div>' + '<div class="span5">' + cleanDecription(result.description) + '</div>' + '<div class="span5">' + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + '}' + "<br/>" + (result.lod ? "Lod" : "Classic") + "/" + (result.sc ? "Softcore" : "Hardcore") + "/" + (result.ladder ? "Ladder" : "NonLadder") + '</div>' + '</div><hr>';
         var $item = $(htmlTemplate);
         $item.click(function() {
             $(this).toggleClass("selected");
@@ -533,6 +664,14 @@ $(function() {
         });
     }
     
+    function addMuleForLoggingDialog(){
+        $("#modelDialog").html($("#template-addMule").html());
+        $("#modelDialog").modal({show:true,backdrop:"static"})
+    }
+    function addMuleForLogging(realm,account,password,character){
+        
+    }
+    
     function start() {
         CurrentRealm = window.localStorage.getItem("CurrentRealm");
         if (!CurrentRealm) {
@@ -588,13 +727,25 @@ $(function() {
             pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
         });
         pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
+        
+        $(function() {
+            setInterval(function() {
+                if ($("#loadMore").visible()) {
+                    if (window.loadMoreItem) window.loadMoreItem();
+                }
+            }, 10);
+        })
+
+        $("#addMule").click(addMuleForLoggingDialog);
+        
     }
-    start();
+    
+    //window.init = function(){
+    getChallange(function(){
+            
+        API.profiles(function(err,res) {
+            start();
+        })
+    })
+    //}
 });
-$(function() {
-    setInterval(function() {
-        if ($("#loadMore").visible()) {
-            if (window.loadMoreItem) window.loadMoreItem();
-        }
-    }, 10);
-})

@@ -3,18 +3,25 @@ function main() {
 	include("OOG.js");
 	include("common/misc.js");
 
-	var handle,
+	var handle,gameInfo,
 		isUp = "no";
 
 	function copyDataEvent(mode, msg) {
+		print(mode);
+		print(msg);
 		switch (msg) {
 		case "Handle":
 			handle = mode;
-
 			break;
 		}
 
 		switch (mode) {
+		case 2: // Game info
+			print("Recieved Game Info");
+	
+			gameInfo = JSON.parse(msg);
+			
+			break;
 		case 3: // request game
 			var obj = JSON.parse(msg);
 
@@ -44,6 +51,13 @@ function main() {
 	D2Bot.init();
 	load("tools/heartbeat.js");
 
+	while (!gameInfo) {
+		D2Bot.requestGameInfo();
+		delay(500);
+	}
+	
+	print(D2Bot.getProfile());
+	
 	while (true) {
 		if (me.gameReady) {
 			if (isUp === "no") {
