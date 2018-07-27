@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="../kolbot/libs/json2.js"></script>
+        <script>
+            
+            window.start = function(){
+                window.external.JSONApi(JSON.stringify({func:'start',args:['test1']})) 
+                return "good start";
+            }
+            window.stop = function(){
+                window.external.JSONApi(JSON.stringify({func:'stop',args:['test1']})) 
+                return "good stop";
+            }
+            
+            
+        </script>
+    </head>
+</html>

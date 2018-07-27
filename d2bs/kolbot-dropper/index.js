@@ -345,9 +345,9 @@ $(function() {
 	    
     var apikey = window.urlParams.get("apikey") || "68a1s6d5f16a51sdf651asdf"; // replace this with user input from text box, clear text box after
 			
-	function getChallange(done)
+	function getChallange(done,forceNew)
 	{
-		if (SessionKey && SessionKey.length > 0)
+		if (!forceNew && SessionKey && SessionKey.length > 0)
 			done(SessionKey);
 		
 		API.challenge(function(err,challenge)
@@ -361,6 +361,7 @@ $(function() {
         // store/retreieve/delete for the temp storage, accounts, profiles, query and start
         function Api() {}
         Api.prototype.$get = function(requestObject, done, fail) {
+            var self = this;
             if (!requestObject.profile) requestObject.profile = SessionKey || "null";
             var thejson = JSON.stringify(requestObject);
             var Base64blob = window.Base64.encode(JSON.stringify(requestObject));
@@ -375,7 +376,14 @@ $(function() {
             var request = $.ajax($request);
             request.done(function(msg) {
                 console.log("results",msg)
-                if (done) done(msg, request);
+                if(msg.status == "auth" && msg.results == "invalid session"){
+                    getChallange(function(profile){
+                        requestObject.profile = profile;
+                        self.$get(requestObject,done,fail);    
+                    },true);
+                    return;
+                }
+                if (done) done(msg, $request);
             });
             request.fail(function(jqXHR, textStatus) {
                 if (fail) fail(jqXHR, textStatus, request);
@@ -403,7 +411,11 @@ $(function() {
             var args = [];
             if (account) args.push(account);
             self.$get({ func: "accounts", args: args }, function(msg, request) {
-                done(null, msg);
+                if(msg.status == "success"){
+                    done(null, JSON.parse(msg.results));
+                }else{
+                    done(msg);
+                }
             }, function(jqXHR, textStatus) {
                 done(textStatus);
             });
@@ -411,7 +423,11 @@ $(function() {
         Api.prototype.profiles = function(done) {
             var self = this;
             self.$get({ func: "profiles", args: [] }, function(msg, request) {
-                done(null, msg);
+                if(msg.status == "success"){
+                    done(null, JSON.parse(msg.results));
+                }else{
+                    done(msg);
+                }
             }, function(jqXHR, textStatus) {
                 done(textStatus);
             });
@@ -426,7 +442,11 @@ $(function() {
             if (account) args.push(account); //else args.push("");
             if (charname) args.push(charname); //else args.push("");
             self.$get({ func: "query", args: args }, function(msg, request) {
-                done(null, msg);
+                if(msg.status == "success"){
+                    done(null, JSON.parse(msg.results));
+                }else{
+                    done(msg);
+                }
             }, function(jqXHR, textStatus) {
                 done(textStatus);
             });
@@ -745,6 +765,7 @@ $(function() {
             
         API.profiles(function(err,res) {
             start();
+            
         })
     })
     //}

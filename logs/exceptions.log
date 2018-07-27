@@ -1,71 +1,11 @@
-7/24/2018 3:03 AM
-Newtonsoft.Json.JsonReaderException: Unexpected character encountered while parsing value: �. Path '', line 0, position 0.
-   at Newtonsoft.Json.JsonTextReader.ParseValue()
-   at Newtonsoft.Json.JsonTextReader.ReadInternal()
-   at Newtonsoft.Json.JsonTextReader.Read()
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.ReadForType(JsonReader reader, JsonContract contract, Boolean hasConverter)
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Deserialize(JsonReader reader, Type objectType, Boolean checkAdditionalContent)
-   at Newtonsoft.Json.JsonSerializer.DeserializeInternal(JsonReader reader, Type objectType)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject(String value, Type type, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value)
-   at D2Bot.Main.HandleWebApi(String message)
+7/26/2018 7:45 PM
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at D2Bot.WebBrowser.invokeEval(String text) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebBrowser.cs:line 46
+   at D2Bot.Main.HandleJSONApi(String message, WebBrowser damon) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\MsgHandler.cs:line 126
 
-7/24/2018 3:04 AM
-Newtonsoft.Json.JsonReaderException: Unexpected character encountered while parsing value: �. Path '', line 0, position 0.
-   at Newtonsoft.Json.JsonTextReader.ParseValue()
-   at Newtonsoft.Json.JsonTextReader.ReadInternal()
-   at Newtonsoft.Json.JsonTextReader.Read()
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.ReadForType(JsonReader reader, JsonContract contract, Boolean hasConverter)
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Deserialize(JsonReader reader, Type objectType, Boolean checkAdditionalContent)
-   at Newtonsoft.Json.JsonSerializer.DeserializeInternal(JsonReader reader, Type objectType)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject(String value, Type type, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value)
-   at D2Bot.Main.HandleWebApi(String message)
-
-7/24/2018 3:20 AM
-Newtonsoft.Json.JsonReaderException: Unexpected character encountered while parsing value: �. Path '', line 0, position 0.
-   at Newtonsoft.Json.JsonTextReader.ParseValue()
-   at Newtonsoft.Json.JsonTextReader.ReadInternal()
-   at Newtonsoft.Json.JsonTextReader.Read()
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.ReadForType(JsonReader reader, JsonContract contract, Boolean hasConverter)
-   at Newtonsoft.Json.Serialization.JsonSerializerInternalReader.Deserialize(JsonReader reader, Type objectType, Boolean checkAdditionalContent)
-   at Newtonsoft.Json.JsonSerializer.DeserializeInternal(JsonReader reader, Type objectType)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject(String value, Type type, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value, JsonSerializerSettings settings)
-   at Newtonsoft.Json.JsonConvert.DeserializeObject[T](String value)
-   at D2Bot.Main.HandleWebApi(String key, String message)
-
-7/24/2018 3:44 PM
-System.IO.PathTooLongException: The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
-   at System.IO.PathHelper.GetFullPathName()
-   at System.IO.Path.LegacyNormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.NormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.GetFullPathInternal(String path)
-   at System.IO.File.InternalGetLastWriteTimeUtc(String path, Boolean checkHost)
-   at System.IO.File.GetLastWriteTime(String path)
-   at D2Bot.WebServer.ProcessContext(HttpListenerContext context) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 255
-   at D2Bot.WebServer.Listen() in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 166
-
-7/24/2018 3:51 PM
-System.IO.PathTooLongException: The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
-   at System.IO.PathHelper.GetFullPathName()
-   at System.IO.Path.LegacyNormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.NormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.GetFullPathInternal(String path)
-   at System.IO.File.InternalGetLastWriteTimeUtc(String path, Boolean checkHost)
-   at System.IO.File.GetLastWriteTime(String path)
-   at D2Bot.WebServer.ProcessContext(HttpListenerContext context) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 255
-   at D2Bot.WebServer.Listen() in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 166
-
-7/24/2018 5:25 PM
-System.IO.PathTooLongException: The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
-   at System.IO.Path.LegacyNormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.NormalizePath(String path, Boolean fullCheck, Int32 maxPathLength, Boolean expandShortPaths)
-   at System.IO.Path.InternalGetDirectoryName(String path)
-   at System.IO.Path.GetDirectoryName(String path)
-   at D2Bot.WebServer.FilePathIsValid(String path) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 309
-   at D2Bot.WebServer.ProcessContext(HttpListenerContext context) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 211
-   at D2Bot.WebServer.Listen() in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 166
+7/26/2018 11:15 PM
+System.Net.HttpListenerException (0x80004005): The handle is invalid
+   at System.Net.HttpResponseStream.Write(Byte[] buffer, Int32 offset, Int32 size)
+   at D2Bot.WebServer.ProcessContext(HttpListenerContext context) in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 250
+   at D2Bot.WebServer.Listen() in C:\Users\bmatusiak\Desktop\d2-dropper\d2botsharp\WebServer.cs:line 168
 
