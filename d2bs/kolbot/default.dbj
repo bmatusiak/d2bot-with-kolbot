@@ -9,6 +9,7 @@ include("Gambling.js");
 include("CraftingSystem.js");
 include("TorchSystem.js");
 include("MuleLogger.js");
+include("limeDropper.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/CollMap.js");
@@ -52,6 +53,11 @@ function main() {
 
 	// MuleLogger handler
 	if (MuleLogger.inGameCheck()) {
+		return true;
+	}
+	
+	// limeDropper handler
+	if (limeDropper.inGameCheck()) {
 		return true;
 	}
 
