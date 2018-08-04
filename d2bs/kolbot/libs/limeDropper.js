@@ -6,10 +6,17 @@
 
 var limeDropper = {
 	//General
-	IngameTime: 9999, // Time to wait after leaving game
+	IngameTime: 60, // Time to wait after leaving game
+	
+	
+	
+	
+	
+	
+	
 	
 	//Logging
-	LogNames: true, // Put account/character name on the picture
+	LogNames: true, // REQUIRED!
 	LogItemLevel: true, // Add item level to the picture
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
@@ -20,18 +27,21 @@ var limeDropper = {
 	
 	// don't edit
 	starterInit:function(){
-		addEventListener('copydata', limeDropper.ReceiveCopyData);
 		limeDropper.loadTag();
 	},
 	loadTag:function(){//updateTag
 		limeDropper.profileTag = false;
+		if(!limeDropper.ReceiveCopyDataLoaded){
+			addEventListener('copydata', limeDropper.ReceiveCopyData);
+			limeDropper.ReceiveCopyDataLoaded=true;
+		}
 		while(!limeDropper.profileTag){
 			D2Bot.getProfile();
 			delay(500);
 		}
 		print("Got profileTag");
 	},
-	
+	ReceiveCopyDataLoaded:false,
 	ReceiveCopyData: function(mode, msg) {
 		// getProfile 
 		if(mode == 1638){
@@ -39,22 +49,26 @@ var limeDropper = {
 		}
 	},
 	
-	setTag: function(status){
-		
+	setTag: function(status, code){
 		limeDropper.profileTag.status = status;
+		limeDropper.profileTag.code = status;
 		D2Bot.setTag(JSON.stringify(limeDropper.profileTag));
 	},
 	
 	initGame: function(){
 		switch(limeDropper.profileTag.action){
 			case "doMule":
-				return true;//createGame
+				return true;//joinGame
 				break;
 			case "doDrop":
 				return false;//createGame
 				break;
 			default:
-				return true;//createGame
+				if(limeDropper.profileTag.gameName)
+					return true;//joinGame
+				else{
+					return true;//createGame  -- default
+				}	
 				break;
 		}
 		return true;
@@ -66,11 +80,22 @@ var limeDropper = {
 		joinGame(limeDropper.profileTag.muleInfo.gameName, limeDropper.profileTag.muleInfo.gamePass);
 	},
 	login: function() {
+		var password;
+		
+		if(limeDropper.profileTag && limeDropper.profileTag.muleInfo)
+			password = limeDropper.profileTag.muleInfo.password || limeDropper.getMulePass(md5(	limeDropper.profileTag.muleInfo.realm +
+														limeDropper.profileTag.muleInfo.account) )
+		
+		if(!password){
+			limeDropper.setTag("ERROR","NOPASSWORD")
+			while(true){
+				delay(500);
+			}
+		}
+	
 		ControlAction.loginAccount({
 			account: limeDropper.profileTag.muleInfo.account, 
-			password:	limeDropper.profileTag.muleInfo.password || 
-						limeDropper.getMulePass(md5(	limeDropper.profileTag.muleInfo.realm +
-														limeDropper.profileTag.muleInfo.account) ),
+			password:	password,
 			realm: limeDropper.profileTag.muleInfo.realm});
 	},
 	charList: function(){
@@ -91,11 +116,6 @@ var limeDropper = {
 		return rval;
 	},
 	
-	doneMuleingAccount:function(){
-		limeDropper.setTag("DONE");
-		D2Bot.stop(me.profile);
-		while(true) delay(500)
-	},
 	getItemDesc: function (unit, logIlvl) {
 		var i, desc,
 			stringColor = "";
@@ -134,24 +154,25 @@ var limeDropper = {
 
 	inGameCheck: function () {
 		if (getScript("D2BotlimeDropper.dbj")) {
-			print("test")
-			addEventListener('copydata', limeDropper.ReceiveCopyData);
 			limeDropper.loadTag();
 			switch(limeDropper.profileTag.action){
 				case "doMule":
 					this.logChar();
 					break;
 				case "doDrop":
-					this.dropItems(limeDropper.profileTag.dropItems);
+					this.dropItems(limeDropper.profileTag.muleInfo.items);
 					break;
 				default:
 					break;
 			}
-
+			
+			limeDropper.setTag("DONE-INGAME");
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
 				delay(1000);
 			}
-
+			
+			limeDropper.logChar()
+			delay(2000);
 			quit();
 			//delay(10000);
 
@@ -214,7 +235,6 @@ var limeDropper = {
 					if(unit.classid.toString() == classid &&  unit.location.toString() == location &&  unit.x.toString() == unitX && unit.y.toString() == unitY)
 						unit.drop();
 					
-					break;
 				}
 			}
 		}
