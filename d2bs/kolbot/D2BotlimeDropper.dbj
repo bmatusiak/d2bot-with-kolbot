@@ -27,13 +27,11 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var handle, gameInfo, gameStart, ingame, connectFail, $currChar, charList,
+var handle, gameInfo, gameStart, ingame, connectFail, $currChar, charList, nextAcc,
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1;
 
 function ReceiveCopyData(mode, msg) {
-	print(mode + " " +msg);
-	
 	switch (msg) {
 	case "Handle":
 		handle = mode;
@@ -65,6 +63,24 @@ function timeoutDelay(text, time) {
 		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
 		delay(500);
 	}
+}
+
+function ingameTimeout(time) {
+	var tick = getTickCount();
+
+	while (getTickCount() - tick < time) {
+		if (me.ingame && me.gameReady) {
+			return true;
+		}
+
+		if (getLocation() === 28) { // game doesn't exist, might need more locs
+			break;
+		}
+
+		delay(100);
+	}
+
+	return me.ingame && me.gameReady;
 }
 
 function locationTimeout(time, location) {
@@ -103,11 +119,6 @@ function main() {
 	D2Bot.init();
 	load("tools/heartbeat.js");
 
-
-	while(true){
-		delay(500);
-	}
-	
 	while (!gameInfo) {
 		D2Bot.requestGameInfo();
 		delay(500);
@@ -139,7 +150,9 @@ function main() {
 	}
 
 	DataFile.updateStats("debugInfo", JSON.stringify({currScript: "none", area: "out of game"}));
-
+	
+	var quitAfterFirstGame = limeDropper.profileTag.action == "doDrop"? true : false;//, false;
+	
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
@@ -157,6 +170,15 @@ function main() {
 
 			delay(1000);
 		}
+		
+		if(ingame && quitAfterFirstGame){
+			limeDropper.setTag("DONE");
+			D2Bot.stop();
+			
+			while(true){
+				delay(500);
+			}
+		} 
 
 		locationAction(getLocation());
 		delay(1000);
@@ -252,16 +274,15 @@ MainSwitch:
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
-		D2Bot.requestGame(master);
 		delay(100);
 
 		limeDropper.joinGame();
 		
-		if (joinInfo && joinInfo.gameName !== "" && joinInfo.inGame) {
-			joinGame(joinInfo.gameName, joinInfo.gamePass);
-		} else {
-			joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
-		}
+		// if (joinInfo && joinInfo.gameName !== "" && joinInfo.inGame) {
+		// 	joinGame(joinInfo.gameName, joinInfo.gamePass);
+		// } else {
+		// 	joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+		// }
 
 		ingameTimeout(5000);
 		print("Ingame timeout done.");
@@ -273,6 +294,14 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
+		if (nextAcc) {
+			limeDropper.setTag("DONE");
+			D2Bot.stop();
+			
+			while(true){
+				delay(500);
+			}
+		}
 		
 		limeDropper.login();
 
@@ -397,6 +426,8 @@ MainSwitch:
 		if(!charList) charList = limeDropper.charList()
 		
 		if (!charList.length) {
+			
+			nextAcc = true; // Go to next account
 			ControlAction.click(6, 33, 572, 128, 35);
 
 			break;
@@ -416,14 +447,9 @@ MainSwitch:
 			}
 		}
 
-		// last char in acc = trigger next acc
 		if (!charList.length) {
-			//done
-			limeDropper.doneMuleingAccount();
-			while(true){
-				limeDropper.setTag("DONE")
-				delay(500)
-			}
+			nextAcc = true;
+
 			break;
 		}
 		print
@@ -598,6 +624,8 @@ MainSwitch:
 		}
 
 		if (!locationTimeout(5000, location)) {
+			nextAcc = true; // Go to next account
+
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
